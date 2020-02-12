@@ -16,6 +16,11 @@ class Submit_sitemap_ext
         )
     );
 
+    private $search_engines = array(
+        // urlencode sitemap url
+        'google' => 'https://google.com/ping?sitemap='
+    );
+
     function __construct()
     {
         $addon = ee('Addon')->get('submit_sitemap');
