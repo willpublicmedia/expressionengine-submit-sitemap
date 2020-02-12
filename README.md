@@ -1,6 +1,6 @@
-# ExpressionEngine Submit Sitemap Addon
+# ExpressionEngine Submit Sitemap Extension
 
-An ExpressionEngine addon that pings search engines with an updated sitemap when new content is published.
+An ExpressionEngine extension that pings search engines with an updated sitemap when new content is published.
 
 ## Dependencies
 
