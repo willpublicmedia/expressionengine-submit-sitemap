@@ -62,9 +62,11 @@ class Submit_sitemap_ext
 
     public function submit_sitemaps($entry, $values)
     {
-        foreach (array_values($this->search_engines) as $engine)
+        $responses = [];
+        foreach ($this->search_engines as $engine => $url)
         {
-            $this->ping_search_engine($engine, $this->sitemap);
+            $response = $this->ping_search_engine($url, $this->sitemap);
+            $responses[$engine] = $response;
         }
     }
 
@@ -120,11 +122,11 @@ class Submit_sitemap_ext
         if ($this->use_async === false)
         {
             $response = $this->connect_as_curl($submission_url, $this->ping_uri, $sitemap_url);
-            return;
+            return $response;
         }
 
         $response = $this->connect_async($submission_url, $sitemap_url);
-        $response = $response->wait();
+        return $response;
     }
 
     private function test_async()
