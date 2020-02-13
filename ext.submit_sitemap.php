@@ -101,6 +101,12 @@ class Submit_sitemap_ext
 
     private function test_async()
     {
+        if (file_exists(__DIR__ . '/vendor/autoload.php'))
+        {
+            require_once(__DIR__ . '/vendor/autoload.php');
+            return true;
+        }
+        
         return false;
     }
 }
