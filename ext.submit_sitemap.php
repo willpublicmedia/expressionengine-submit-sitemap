@@ -71,10 +71,7 @@ class Submit_sitemap_ext
 
         if ($this->use_async)
         {
-            foreach ($responses as $engine => $response)
-            {
-                $response->wait();
-            }
+            GuzzleHttp\Promise\settle(array_values($responses))->wait();
         }
         else
         {
