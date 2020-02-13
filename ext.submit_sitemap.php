@@ -57,7 +57,7 @@ class Submit_sitemap_ext
         ee('Model')->get('Extension')->filter('class', __CLASS__)->delete();
     }
 
-    public function submit_sitemap($entry, $values)
+    public function submit_sitemaps($entry, $values)
     {
         return;
     }
