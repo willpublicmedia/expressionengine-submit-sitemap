@@ -71,9 +71,24 @@ class Submit_sitemap_ext
 
         if ($this->use_async)
         {
-            foreach ($responses as $response)
+            foreach ($responses as $engine => $response)
             {
                 $response->wait();
+            }
+        }
+        else
+        {
+            foreach ($responses as $engine => $response)
+            {
+                $status = $response['http_code'];
+                if (((string)$status)[0] !== '2')
+                {
+                    ee('CP/Alert')->makeInline('sitemap-ping')
+                        ->asAttention()
+                        ->withTitle('Sitemap update issue')
+                        ->addToBody("$engine returned status code $status on sitemap update.")
+                        ->defer();
+                }
             }
         }
     }
@@ -91,11 +106,24 @@ class Submit_sitemap_ext
         $promise->then(
             function (ResponseInterface $res)
             {
-                return $res->getStatusCode();
+                $status = $res->getStatusCode();
+                if (((string)$status)[0] !== '2')
+                {
+                    ee('CP/Alert')->makeInline('sitemap-ping')
+                        ->asAttention()
+                        ->withTitle('Sitemap update issue')
+                        ->addToBody("$search_url returned status $status.")
+                        ->defer();
+                }
             },
             function (RequestException $err)
             {
-                return $err->getMessage();
+                $message = $err->getMessage();
+                ee('CP/Alert')->makeInline('sitemap-ping')
+                    ->asWarning()
+                    ->withTitle('Sitemap update issue')
+                    ->addToBody("$search_url failed with error message $message.")
+                    ->defer();
             }
         );
 
