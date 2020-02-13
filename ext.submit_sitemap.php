@@ -18,13 +18,15 @@ class Submit_sitemap_ext
 
     private $search_engines = array(
         // urlencode sitemap url
-        'google' => 'https://google.com/ping?sitemap='
+        // 'google' => 'https://google.com/ping?sitemap='
+        'test' => 'https://localhost:44333/ping?sitemap='
     );
 
     function __construct()
     {
         $addon = ee('Addon')->get('submit_sitemap');
         $this->version = $addon->getVersion();
+        $this->sitemap = $this->load_sitemap(site_url(), '/sitemap');
     }
 
     public function activate_extension()
@@ -58,5 +60,13 @@ class Submit_sitemap_ext
     public function submit_sitemap($entry, $values)
     {
         return;
+    }
+
+    private function load_sitemap($host, $uri)
+    {
+        $sitemap = rtrim($host, '/') . '/' . ltrim($uri, '/');
+        $sitemap = rawurlencode($sitemap);
+
+        return $sitemap;
     }
 }
