@@ -16,8 +16,10 @@ class Submit_sitemap_ext
         )
     );
 
+    private $ping_uri = 'ping?sitemap=';
+
     private $search_engines = array(
-        'google' => 'https://google.com/ping?sitemap='
+        'google' => 'https://google.com'
     );
 
     private $sitemap;
@@ -66,10 +68,36 @@ class Submit_sitemap_ext
         }
     }
 
-    private function connect_as_curl($search_url, $sitemap_url)
+    private function connect_async($search_url, $sitemap_url)
     {
+        $client = new GuzzleHttp\Client([
+            'base_uri' => $search_url
+        ]);
+
+        $promise = $client->requestAsync('GET', '/ping', [
+            'query' => ['sitemap' => $sitemap_url]
+        ]);
+
+        $promise->then(
+            function (ResponseInterface $res)
+            {
+                return $res->getStatusCode();
+            },
+            function (RequestException $err)
+            {
+                return $err->getMessage();
+            }
+        );
+
+        return $promise;
+    }
+
+    private function connect_as_curl($search_url, $ping_uri, $sitemap_url)
+    {
+        $url = $search_url . '/' . $ping_uri . $sitemap_url;
+
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $search_url . $sitemap_url);
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HEADER, true);
 
         $response = curl_exec($ch);
@@ -91,12 +119,12 @@ class Submit_sitemap_ext
     {
         if ($this->use_async === false)
         {
-            $response = $this->connect_as_curl($submission_url, $sitemap_url);
-            print_r($response);
+            $response = $this->connect_as_curl($submission_url, $this->ping_uri, $sitemap_url);
             return;
         }
 
-        throw new \Exception('Async search ping not implemented.');
+        $response = $this->connect_async($submission_url, $sitemap_url);
+        $response = $response->wait();
     }
 
     private function test_async()
