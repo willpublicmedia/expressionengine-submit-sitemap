@@ -17,9 +17,7 @@ class Submit_sitemap_ext
     );
 
     private $search_engines = array(
-        // urlencode sitemap url
-        // 'google' => 'https://google.com/ping?sitemap='
-        'test' => 'https://localhost:44333/ping?sitemap='
+        'google' => 'https://google.com/ping?sitemap='
     );
 
     private $sitemap;
@@ -29,6 +27,7 @@ class Submit_sitemap_ext
         $addon = ee('Addon')->get('submit_sitemap');
         $this->version = $addon->getVersion();
         $this->sitemap = $this->load_sitemap(site_url(), '/sitemap');
+        $this->use_async = $this->test_async();
     }
 
     public function activate_extension()
@@ -67,6 +66,19 @@ class Submit_sitemap_ext
         }
     }
 
+    private function connect_as_curl($search_url, $sitemap_url)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $search_url . $sitemap_url);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+
+        $response = curl_exec($ch);
+        $status = curl_getinfo($ch);
+        curl_close($ch);
+
+        return $status;
+    }
+
     private function load_sitemap($host, $uri)
     {
         $sitemap = rtrim($host, '/') . '/' . ltrim($uri, '/');
@@ -77,6 +89,18 @@ class Submit_sitemap_ext
 
     private function ping_search_engine($submission_url, $sitemap_url)
     {
-        return;
+        if ($this->use_async === false)
+        {
+            $response = $this->connect_as_curl($submission_url, $sitemap_url);
+            print_r($response);
+            return;
+        }
+
+        throw new \Exception('Async search ping not implemented.');
+    }
+
+    private function test_async()
+    {
+        return false;
     }
 }
