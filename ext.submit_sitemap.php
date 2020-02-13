@@ -68,6 +68,14 @@ class Submit_sitemap_ext
             $response = $this->ping_search_engine($url, $this->sitemap);
             $responses[$engine] = $response;
         }
+
+        if ($this->use_async)
+        {
+            foreach ($responses as $response)
+            {
+                $response->wait();
+            }
+        }
     }
 
     private function connect_async($search_url, $sitemap_url)
