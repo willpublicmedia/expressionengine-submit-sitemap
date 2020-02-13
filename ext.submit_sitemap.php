@@ -22,6 +22,8 @@ class Submit_sitemap_ext
         'test' => 'https://localhost:44333/ping?sitemap='
     );
 
+    private $sitemap;
+
     function __construct()
     {
         $addon = ee('Addon')->get('submit_sitemap');
@@ -59,7 +61,10 @@ class Submit_sitemap_ext
 
     public function submit_sitemaps($entry, $values)
     {
-        return;
+        foreach (array_values($this->search_engines) as $engine)
+        {
+            $this->ping_search_engine($engine, $this->sitemap);
+        }
     }
 
     private function load_sitemap($host, $uri)
@@ -68,5 +73,10 @@ class Submit_sitemap_ext
         $sitemap = rawurlencode($sitemap);
 
         return $sitemap;
+    }
+
+    private function ping_search_engine($submission_url, $sitemap_url)
+    {
+        return;
     }
 }
