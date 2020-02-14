@@ -29,6 +29,8 @@ class Submit_sitemap_ext
         'google' => 'https://google.com',
         'yahoo' => 'https://yahoo.com'
     );
+    
+    private $is_production;
 
     private $sitemap;
 
@@ -38,6 +40,7 @@ class Submit_sitemap_ext
         $this->version = $addon->getVersion();
         $this->sitemap = $this->load_sitemap(site_url(), '/sitemap');
         $this->use_async = $this->test_async();
+        $this->is_production = $this->test_production('https://will.illinois.edu');
     }
 
     public function activate_extension()
@@ -189,5 +192,10 @@ class Submit_sitemap_ext
         }
         
         return false;
+    }
+
+    private function test_production($production_url)
+    {
+        return rtrim($production_url, '/') === rtrim(site_url(), '/');
     }
 }
