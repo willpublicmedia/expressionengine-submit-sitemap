@@ -10,6 +10,10 @@ class Submit_sitemap_ext
     public $version;
 
     private $required_extensions = array(
+        'ping_on_delete' => array(
+            'hook' => 'after_channel_entry_delete',
+            'priority' => 10
+        ),
         'ping_on_new' => array(
             'hook' => 'after_channel_entry_insert',
             'priority' => 10
@@ -62,6 +66,11 @@ class Submit_sitemap_ext
     public function disable_extension()
     {
         ee('Model')->get('Extension')->filter('class', __CLASS__)->delete();
+    }
+
+    public function ping_on_delete($entry, $values)
+    {
+        $this->submit_sitemaps();
     }
 
     public function ping_on_new($entry, $values)
