@@ -5,10 +5,19 @@ if (!defined('BASEPATH'))
     exit ('No direct script access allowed.');
 }
 
+/**
+ * Sitemap submission extension.
+ */
 class Submit_sitemap_ext
 {
+    /**
+     * Extension version.
+     */
     public $version;
 
+    /**
+     * Extension activation settings in extension-method => ee-extension-settings format.
+     */
     private $required_extensions = array(
         'ping_on_delete' => array(
             'hook' => 'after_channel_entry_delete',
@@ -22,6 +31,9 @@ class Submit_sitemap_ext
 
     private $ping_uri = 'ping?sitemap=';
 
+    /**
+     * Search engines to ping in name => url format.
+     */
     private $search_engines = array(
         'aol' => 'https://aol.com',
         'bing' => 'https://bing.com',
@@ -30,8 +42,14 @@ class Submit_sitemap_ext
         'yahoo' => 'https://yahoo.com'
     );
     
+    /**
+     * Is the current site running in production.
+     */
     private $is_production;
 
+    /**
+     * Sitemap url in submissible format.
+     */
     private $sitemap;
 
     function __construct()
@@ -43,6 +61,9 @@ class Submit_sitemap_ext
         $this->is_production = $this->test_production('https://will.illinois.edu');
     }
 
+    /**
+     * Register extension methods with EE.
+     */
     public function activate_extension()
     {
         if (ee('Model')->get('Extension')->filter('class', __CLASS__)->count() > 0)
@@ -66,11 +87,17 @@ class Submit_sitemap_ext
         }
     }
 
+    /**
+     * Disable class extension methods.
+     */
     public function disable_extension()
     {
         ee('Model')->get('Extension')->filter('class', __CLASS__)->delete();
     }
 
+    /**
+     * Ping search engines when channel entries are deleted and site is production.
+     */
     public function ping_on_delete($entry, $values)
     {
         if ($this->is_production)
@@ -79,6 +106,9 @@ class Submit_sitemap_ext
         }
     }
 
+    /**
+     * Ping search engines when channel entries are created and site is in production.
+     */
     public function ping_on_new($entry, $values)
     {
         if ($this->is_production)
@@ -87,6 +117,9 @@ class Submit_sitemap_ext
         }
     }
 
+    /**
+     * Ping search engines asynchronously.
+     */
     private function connect_async($search_url, $sitemap_url)
     {
         $client = new GuzzleHttp\Client([
@@ -124,6 +157,9 @@ class Submit_sitemap_ext
         return $promise;
     }
 
+    /**
+     * Ping search engines synchronously using php_curl.
+     */
     private function connect_as_curl($search_url, $ping_uri, $sitemap_url)
     {
         $url = $search_url . '/' . $ping_uri . $sitemap_url;
@@ -139,6 +175,9 @@ class Submit_sitemap_ext
         return $status;
     }
 
+    /**
+     * Prepare sitemap url for submission.
+     */
     private function load_sitemap($host, $uri)
     {
         $sitemap = rtrim($host, '/') . '/' . ltrim($uri, '/');
@@ -147,6 +186,9 @@ class Submit_sitemap_ext
         return $sitemap;
     }
 
+    /**
+     * Determine which connection method to use.
+     */
     private function ping_search_engine($submission_url, $sitemap_url)
     {
         if ($this->use_async === false)
@@ -159,6 +201,9 @@ class Submit_sitemap_ext
         return $response;
     }
 
+    /**
+     * Submit sitemaps to search engines and process responses.
+     */
     private function submit_sitemaps()
     {
         $responses = [];
@@ -189,6 +234,9 @@ class Submit_sitemap_ext
         }
     }
 
+    /**
+     * Check whether asynchronous connection tools have been installed.
+     */
     private function test_async()
     {
         if (file_exists(__DIR__ . '/vendor/autoload.php'))
@@ -200,6 +248,9 @@ class Submit_sitemap_ext
         return false;
     }
 
+    /**
+     * Check whether the site's current url matches the expected production url.
+     */
     private function test_production($production_url)
     {
         return rtrim($production_url, '/') === rtrim(site_url(), '/');
