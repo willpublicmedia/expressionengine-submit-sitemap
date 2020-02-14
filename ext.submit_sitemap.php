@@ -10,7 +10,7 @@ class Submit_sitemap_ext
     public $version;
 
     private $required_extensions = array(
-        'submit_sitemaps' => array(
+        'ping_on_new' => array(
             'hook' => 'after_channel_entry_save',
             'priority' => 10
         )
@@ -64,34 +64,9 @@ class Submit_sitemap_ext
         ee('Model')->get('Extension')->filter('class', __CLASS__)->delete();
     }
 
-    public function submit_sitemaps($entry, $values)
+    public function ping_on_new($entry, $values)
     {
-        $responses = [];
-        foreach ($this->search_engines as $engine => $url)
-        {
-            $response = $this->ping_search_engine($url, $this->sitemap);
-            $responses[$engine] = $response;
-        }
-
-        if ($this->use_async)
-        {
-            GuzzleHttp\Promise\settle(array_values($responses))->wait();
-        }
-        else
-        {
-            foreach ($responses as $engine => $response)
-            {
-                $status = $response['http_code'];
-                if (((string)$status)[0] !== '2')
-                {
-                    ee('CP/Alert')->makeInline('sitemap-ping')
-                        ->asAttention()
-                        ->withTitle('Sitemap update issue')
-                        ->addToBody("$engine returned status code $status on sitemap update.")
-                        ->defer();
-                }
-            }
-        }
+        $this->submit_sitemaps();
     }
 
     private function connect_async($search_url, $sitemap_url)
@@ -164,6 +139,36 @@ class Submit_sitemap_ext
 
         $response = $this->connect_async($submission_url, $sitemap_url);
         return $response;
+    }
+
+    private function submit_sitemaps()
+    {
+        $responses = [];
+        foreach ($this->search_engines as $engine => $url)
+        {
+            $response = $this->ping_search_engine($url, $this->sitemap);
+            $responses[$engine] = $response;
+        }
+
+        if ($this->use_async)
+        {
+            GuzzleHttp\Promise\settle(array_values($responses))->wait();
+        }
+        else
+        {
+            foreach ($responses as $engine => $response)
+            {
+                $status = $response['http_code'];
+                if (((string)$status)[0] !== '2')
+                {
+                    ee('CP/Alert')->makeInline('sitemap-ping')
+                        ->asAttention()
+                        ->withTitle('Sitemap update issue')
+                        ->addToBody("$engine returned status code $status on sitemap update.")
+                        ->defer();
+                }
+            }
+        }
     }
 
     private function test_async()
