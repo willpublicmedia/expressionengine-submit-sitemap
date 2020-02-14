@@ -11,7 +11,7 @@ class Submit_sitemap_ext
 
     private $required_extensions = array(
         'ping_on_new' => array(
-            'hook' => 'after_channel_entry_save',
+            'hook' => 'after_channel_entry_insert',
             'priority' => 10
         )
     );
