@@ -118,6 +118,23 @@ class Submit_sitemap_ext
     }
 
     /**
+     * Update extension.
+     */
+    public function update_extension($current = '')
+    {
+        if ($current == '' OR $current == $this->version)
+        {
+            return FALSE;
+        }
+
+        ee()->db->where('class', __CLASS__);
+        ee()->db->update(
+            'extensions',
+            array('version' => $this->version)
+        );
+    }
+
+    /**
      * Ping search engines asynchronously.
      */
     private function connect_async($search_url, $sitemap_url)
