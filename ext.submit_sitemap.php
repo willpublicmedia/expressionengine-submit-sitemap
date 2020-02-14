@@ -19,7 +19,11 @@ class Submit_sitemap_ext
     private $ping_uri = 'ping?sitemap=';
 
     private $search_engines = array(
-        'google' => 'https://google.com'
+        'aol' => 'https://aol.com',
+        'bing' => 'https://bing.com',
+        'duckduckgo' => 'https://duckduckgo.com',
+        'google' => 'https://google.com',
+        'yahoo' => 'https://yahoo.com'
     );
 
     private $sitemap;
