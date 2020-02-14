@@ -73,12 +73,18 @@ class Submit_sitemap_ext
 
     public function ping_on_delete($entry, $values)
     {
-        $this->submit_sitemaps();
+        if ($this->is_production)
+        {
+            $this->submit_sitemaps();
+        }
     }
 
     public function ping_on_new($entry, $values)
     {
-        $this->submit_sitemaps();
+        if ($this->is_production)
+        {
+            $this->submit_sitemaps();
+        }
     }
 
     private function connect_async($search_url, $sitemap_url)
