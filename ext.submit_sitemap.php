@@ -1,8 +1,7 @@
 <?php
 
-if (!defined('BASEPATH')) 
-{
-    exit ('No direct script access allowed.');
+if (!defined('BASEPATH')) {
+    exit('No direct script access allowed.');
 }
 
 /**
@@ -21,12 +20,12 @@ class Submit_sitemap_ext
     private $required_extensions = array(
         'ping_on_delete' => array(
             'hook' => 'after_channel_entry_delete',
-            'priority' => 10
+            'priority' => 10,
         ),
         'ping_on_new' => array(
             'hook' => 'after_channel_entry_insert',
-            'priority' => 10
-        )
+            'priority' => 10,
+        ),
     );
 
     private $ping_uri = 'ping?sitemap=';
@@ -39,9 +38,9 @@ class Submit_sitemap_ext
         'bing' => 'https://bing.com',
         'duckduckgo' => 'https://duckduckgo.com',
         'google' => 'https://google.com',
-        'yahoo' => 'https://yahoo.com'
+        'yahoo' => 'https://yahoo.com',
     );
-    
+
     /**
      * Is the current site running in production.
      */
@@ -52,7 +51,7 @@ class Submit_sitemap_ext
      */
     private $sitemap;
 
-    function __construct()
+    public function __construct()
     {
         $addon = ee('Addon')->get('submit_sitemap');
         $this->version = $addon->getVersion();
@@ -66,13 +65,11 @@ class Submit_sitemap_ext
      */
     public function activate_extension()
     {
-        if (ee('Model')->get('Extension')->filter('class', __CLASS__)->count() > 0)
-        {
+        if (ee('Model')->get('Extension')->filter('class', __CLASS__)->count() > 0) {
             return;
         }
 
-        foreach ($this->required_extensions as $method => $settings)
-        {
+        foreach ($this->required_extensions as $method => $settings) {
             $data = array(
                 'class' => __CLASS__,
                 'method' => $method,
@@ -80,9 +77,9 @@ class Submit_sitemap_ext
                 'priority' => $settings['priority'],
                 'version' => $this->version,
                 'settings' => '',
-                'enabled' => 'y'
+                'enabled' => 'y',
             );
-            
+
             ee('Model')->make('Extension', $data)->save();
         }
     }
@@ -100,8 +97,7 @@ class Submit_sitemap_ext
      */
     public function ping_on_delete($entry, $values)
     {
-        if ($this->is_production)
-        {
+        if ($this->is_production) {
             $this->submit_sitemaps();
         }
     }
@@ -111,8 +107,7 @@ class Submit_sitemap_ext
      */
     public function ping_on_new($entry, $values)
     {
-        if ($this->is_production)
-        {
+        if ($this->is_production) {
             $this->submit_sitemaps();
         }
     }
@@ -122,9 +117,8 @@ class Submit_sitemap_ext
      */
     public function update_extension($current = '')
     {
-        if ($current == '' OR $current == $this->version)
-        {
-            return FALSE;
+        if ($current == '' or $current == $this->version) {
+            return false;
         }
 
         ee()->db->where('class', __CLASS__);
@@ -140,19 +134,17 @@ class Submit_sitemap_ext
     private function connect_async($search_url, $sitemap_url)
     {
         $client = new GuzzleHttp\Client([
-            'base_uri' => $search_url
+            'base_uri' => $search_url,
         ]);
 
         $promise = $client->requestAsync('GET', '/ping', [
-            'query' => ['sitemap' => $sitemap_url]
+            'query' => ['sitemap' => $sitemap_url],
         ]);
 
         $promise->then(
-            function (ResponseInterface $res)
-            {
+            function (ResponseInterface $res) {
                 $status = $res->getStatusCode();
-                if (((string)$status)[0] !== '2')
-                {
+                if (((string) $status)[0] !== '2') {
                     ee('CP/Alert')->makeInline('sitemap-ping')
                         ->asAttention()
                         ->withTitle('Sitemap update issue')
@@ -160,8 +152,7 @@ class Submit_sitemap_ext
                         ->defer();
                 }
             },
-            function (RequestException $err)
-            {
+            function (RequestException $err) {
                 $message = $err->getMessage();
                 ee('CP/Alert')->makeInline('sitemap-ping')
                     ->asWarning()
@@ -208,8 +199,7 @@ class Submit_sitemap_ext
      */
     private function ping_search_engine($submission_url, $sitemap_url)
     {
-        if ($this->use_async === false)
-        {
+        if ($this->use_async === false) {
             $response = $this->connect_as_curl($submission_url, $this->ping_uri, $sitemap_url);
             return $response;
         }
@@ -224,23 +214,17 @@ class Submit_sitemap_ext
     private function submit_sitemaps()
     {
         $responses = [];
-        foreach ($this->search_engines as $engine => $url)
-        {
+        foreach ($this->search_engines as $engine => $url) {
             $response = $this->ping_search_engine($url, $this->sitemap);
             $responses[$engine] = $response;
         }
 
-        if ($this->use_async)
-        {
+        if ($this->use_async) {
             GuzzleHttp\Promise\settle(array_values($responses))->wait();
-        }
-        else
-        {
-            foreach ($responses as $engine => $response)
-            {
+        } else {
+            foreach ($responses as $engine => $response) {
                 $status = $response['http_code'];
-                if (((string)$status)[0] !== '2')
-                {
+                if (((string) $status)[0] !== '2') {
                     ee('CP/Alert')->makeInline('sitemap-ping')
                         ->asAttention()
                         ->withTitle('Sitemap update issue')
@@ -256,12 +240,11 @@ class Submit_sitemap_ext
      */
     private function test_async()
     {
-        if (file_exists(__DIR__ . '/vendor/autoload.php'))
-        {
-            require_once(__DIR__ . '/vendor/autoload.php');
+        if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+            require_once __DIR__ . '/vendor/autoload.php';
             return true;
         }
-        
+
         return false;
     }
 
