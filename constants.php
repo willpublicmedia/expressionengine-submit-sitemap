@@ -1,12 +1,12 @@
-<?php 
+<?php
 
 namespace IllinoisPublicMedia\SubmitSitemap;
 
-if (!defined('BASEPATH')) { 
-    exit ('No direct script access allowed.');
+if (!defined('BASEPATH')) {
+    exit('No direct script access allowed.');
 }
 
-class Constants 
+class Constants
 {
     const NAME = 'Submit Sitemap';
 
@@ -17,6 +17,6 @@ class Constants
     const DESCRIPTION = 'Pings search engines with updated sitemaps on save.';
 
     const DOCS_URL = 'https://gitlab.engr.illinois.edu/willpublicmedia/expressionengine-submit-sitemap';
-    
-    const VERSION = '1.0.0';
+
+    const VERSION = '1.0.1';
 }

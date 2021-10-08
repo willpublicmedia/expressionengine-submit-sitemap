@@ -27,3 +27,9 @@ To avoid accidental submission of dev sites, the extension will only run in prod
 
 - ExpressionEngine v3+
 - [Composer](https://getcomposer.org) _(optional)_
+
+## Changelog
+
+### 1.0.1
+
+- Correct call to `site_url` config item.
