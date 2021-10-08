@@ -56,7 +56,7 @@ class Submit_sitemap_ext
     {
         $addon = ee('Addon')->get('submit_sitemap');
         $this->version = $addon->getVersion();
-        $this->sitemap = $this->load_sitemap(site_url(), '/sitemap');
+        $this->sitemap = $this->load_sitemap(ee()->config->item('site_url'), '/sitemap');
         $this->use_async = $this->test_async();
         $this->is_production = $this->test_production('https://will.illinois.edu');
     }
@@ -270,6 +270,6 @@ class Submit_sitemap_ext
      */
     private function test_production($production_url)
     {
-        return rtrim($production_url, '/') === rtrim(site_url(), '/');
+        return rtrim($production_url, '/') === rtrim(ee()->config->item('site_url'), '/');
     }
 }
