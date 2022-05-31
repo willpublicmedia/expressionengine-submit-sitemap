@@ -30,6 +30,10 @@ To avoid accidental submission of dev sites, the extension will only run in prod
 
 ## Changelog
 
+### Unreleased
+
+- update guzzle
+
 ### 1.0.1
 
 - Correct call to `site_url` config item.
