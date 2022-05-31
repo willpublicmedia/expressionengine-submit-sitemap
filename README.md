@@ -30,7 +30,7 @@ To avoid accidental submission of dev sites, the extension will only run in prod
 
 ## Changelog
 
-### Unreleased
+### 1.0.2
 
 - update guzzle
 
