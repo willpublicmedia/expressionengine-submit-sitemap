@@ -18,5 +18,5 @@ class Constants
 
     const DOCS_URL = 'https://gitlab.engr.illinois.edu/willpublicmedia/expressionengine-submit-sitemap';
 
-    const VERSION = '1.0.2';
+    const VERSION = '1.0.3';
 }
