@@ -16,7 +16,7 @@ class Constants
 
     const DESCRIPTION = 'Pings search engines with updated sitemaps on save.';
 
-    const DOCS_URL = 'https://gitlab.engr.illinois.edu/willpublicmedia/expressionengine-submit-sitemap';
+    const DOCS_URL = 'https://github.com/willpublicmedia/expressionengine-submit-sitemap';
 
     const VERSION = '1.0.3';
 }
