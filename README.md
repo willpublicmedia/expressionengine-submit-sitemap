@@ -30,6 +30,11 @@ To avoid accidental submission of dev sites, the extension will only run in prod
 
 ## Changelog
 
+### 1.0.4
+
+- update guzzle
+- update docs url
+
 ### 1.0.3
 
 - update guzzle
