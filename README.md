@@ -1,5 +1,7 @@
 # ExpressionEngine Submit Sitemap Extension
 
+**OBSOLETE:** Nearly all search engines have dropped ping-based sitemap submission in favor of search console management or automated crawling via robots.txt.
+
 An ExpressionEngine extension that pings a preselected list of search engines when the sitemap has been updated.
 
 ## Installation
