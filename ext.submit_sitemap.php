@@ -58,7 +58,6 @@ class Submit_sitemap_ext
         $addon = ee('Addon')->get('submit_sitemap');
         $this->version = $addon->getVersion();
         $this->sitemap = $this->load_sitemap(ee()->config->item('site_url'), '/sitemap');
-        $this->use_async = $this->test_async();
         $this->is_production = $this->test_production('https://will.illinois.edu');
     }
 
@@ -131,43 +130,6 @@ class Submit_sitemap_ext
     }
 
     /**
-     * Ping search engines asynchronously.
-     */
-    private function connect_async($search_url, $sitemap_url)
-    {
-        $client = new GuzzleHttp\Client([
-            'base_uri' => $search_url,
-        ]);
-
-        $promise = $client->requestAsync('GET', '/ping', [
-            'query' => ['sitemap' => $sitemap_url],
-        ]);
-
-        $promise->then(
-            function (ResponseInterface $res) {
-                $status = $res->getStatusCode();
-                if (((string) $status)[0] !== '2') {
-                    ee('CP/Alert')->makeInline('sitemap-ping')
-                        ->asAttention()
-                        ->withTitle('Sitemap update issue')
-                        ->addToBody("$search_url returned status $status.")
-                        ->defer();
-                }
-            },
-            function (RequestException $err) {
-                $message = $err->getMessage();
-                ee('CP/Alert')->makeInline('sitemap-ping')
-                    ->asWarning()
-                    ->withTitle('Sitemap update issue')
-                    ->addToBody("$search_url failed with error message $message.")
-                    ->defer();
-            }
-        );
-
-        return $promise;
-    }
-
-    /**
      * Ping search engines synchronously using php_curl.
      */
     private function connect_as_curl($search_url, $ping_uri, $sitemap_url)
@@ -201,12 +163,7 @@ class Submit_sitemap_ext
      */
     private function ping_search_engine($submission_url, $sitemap_url)
     {
-        if ($this->use_async === false) {
-            $response = $this->connect_as_curl($submission_url, $this->ping_uri, $sitemap_url);
-            return $response;
-        }
-
-        $response = $this->connect_async($submission_url, $sitemap_url);
+        $response = $this->connect_as_curl($submission_url, $this->ping_uri, $sitemap_url);
         return $response;
     }
 
@@ -221,33 +178,16 @@ class Submit_sitemap_ext
             $responses[$engine] = $response;
         }
 
-        if ($this->use_async) {
-            GuzzleHttp\Promise\settle(array_values($responses))->wait();
-        } else {
-            foreach ($responses as $engine => $response) {
-                $status = $response['http_code'];
-                if (((string) $status)[0] !== '2') {
-                    ee('CP/Alert')->makeInline('sitemap-ping')
-                        ->asAttention()
-                        ->withTitle('Sitemap update issue')
-                        ->addToBody("$engine returned status code $status on sitemap update.")
-                        ->defer();
-                }
+        foreach ($responses as $engine => $response) {
+            $status = $response['http_code'];
+            if (((string) $status)[0] !== '2') {
+                ee('CP/Alert')->makeInline('sitemap-ping-' . $engine)
+                    ->asAttention()
+                    ->withTitle('Sitemap update issue')
+                    ->addToBody("$engine returned status code $status on sitemap update.")
+                    ->defer();
             }
         }
-    }
-
-    /**
-     * Check whether asynchronous connection tools have been installed.
-     */
-    private function test_async()
-    {
-        if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-            require_once __DIR__ . '/vendor/autoload.php';
-            return true;
-        }
-
-        return false;
     }
 
     /**

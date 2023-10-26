@@ -26,9 +26,12 @@ To avoid accidental submission of dev sites, the extension will only run in prod
 ## Dependencies
 
 - ExpressionEngine v3+
-- [Composer](https://getcomposer.org) _(optional)_
 
 ## Changelog
+
+### 3.0.0
+
+- remove guzzle and async submission options
 
 ### 2.0.0
 

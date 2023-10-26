@@ -18,5 +18,5 @@ class Constants
 
     const DOCS_URL = 'https://github.com/willpublicmedia/expressionengine-submit-sitemap';
 
-    const VERSION = '2.0.0';
+    const VERSION = '3.0.0';
 }
