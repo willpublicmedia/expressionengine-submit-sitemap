@@ -36,11 +36,8 @@ class Submit_sitemap_ext
      * Search engines to ping in name => url format.
      */
     private $search_engines = array(
-        'aol' => 'https://aol.com',
         'bing' => 'https://bing.com',
-        'duckduckgo' => 'https://duckduckgo.com',
         'google' => 'https://google.com',
-        'yahoo' => 'https://yahoo.com',
     );
 
     /**

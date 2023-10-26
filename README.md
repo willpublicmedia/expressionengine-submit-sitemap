@@ -29,6 +29,10 @@ To avoid accidental submission of dev sites, the extension will only run in prod
 
 ## Changelog
 
+### 3.0.1
+
+- remove yahoo, duckduckgo, aol from search engine list. submissions now handled by other services.
+
 ### 3.0.0
 
 - remove guzzle and async submission options
