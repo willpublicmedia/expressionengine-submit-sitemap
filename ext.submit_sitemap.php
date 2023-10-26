@@ -30,6 +30,8 @@ class Submit_sitemap_ext
 
     private $ping_uri = 'ping?sitemap=';
 
+    private $use_async = false;
+
     /**
      * Search engines to ping in name => url format.
      */
